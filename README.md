@@ -1,6 +1,7 @@
 # How to Setup and Run the Project
 
 ## Prerequisites
+
 1. **Install Node.js:**
    - Download and install Node.js from the official website: [https://nodejs.org/en/download/](https://nodejs.org/en/download/)
    - Verify installation:
@@ -17,6 +18,7 @@
 ---
 
 ## Steps to Run the Backend
+
 1. Open the project folder in VS Code or any code editor.
 2. Navigate to the `backend` folder:
    ```bash
@@ -26,24 +28,30 @@
    ```bash
    npm install
    ```
-4. Configure the `.env` file:
-   - Add the following variables to the `backend/.env` file:
+4. Configure the `backend/.env` file:
+   - Add the following variables to `backend/.env`:
      ```env
-     MONGO_URI=mongodb+srv://<username>:<password>@cluster.mongodb.net/<dbname>
+     MONGODB_URI=mongodb+srv://<username>:<password>@cluster.mongodb.net/<dbname>
      STRIPE_SECRET_KEY=your_stripe_secret_key
+     CLOUDINARY_NAME=your_cloudinary_cloud_name
+     CLOUDINARY_API_KEY=your_cloudinary_api_key
+     CLOUDINARY_SECRET_KEY=your_cloudinary_secret_key
      PORT=5000
      ```
    - Replace `<username>`, `<password>`, and `<dbname>` with your MongoDB credentials.
+   - Replace the Cloudinary placeholders with the actual Cloudinary account values.
    - Add your Stripe secret key.
 5. Start the backend server:
    ```bash
    npm run server
    ```
+
    - The backend will run at `http://localhost:5000`.
 
 ---
 
 ## Steps to Run the Frontend
+
 1. Navigate to the `frontend` folder:
    ```bash
    cd frontend
@@ -62,6 +70,7 @@
 ---
 
 ## Steps to Run the Admin Panel
+
 1. Navigate to the `admin` folder:
    ```bash
    cd admin
@@ -80,6 +89,7 @@
 ---
 
 ## Notes
+
 1. **Ensure the backend server is running** before starting the frontend or admin panel.
 2. **Database Setup:**
    - MongoDB must be running, and your database should have the appropriate collections (`users`, `products`, `orders`).
@@ -91,9 +101,9 @@
 ---
 
 ## Troubleshooting
+
 - If you encounter any issues, check the terminal logs for errors.
 - Ensure Node.js and MongoDB are correctly installed and running.
 - Clear the browser cache if the frontend or admin panel fails to load.
 
 For further assistance, feel free to reach out!
-

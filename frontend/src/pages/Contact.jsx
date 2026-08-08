@@ -25,7 +25,7 @@ const Contact = () => {
             Tel: +91 784693384 <br /> Email: prajapatiharshil251@gmail.com
           </p>
           <p className="font-semibold text-xl text-gray-600">
-            Careers at Sadiastic
+            Careers at Clothswear
           </p>
           <p className=" text-gray-500">
             Learn more about our teams and job openings.

@@ -6,9 +6,9 @@ const Footer = () => {
     <div>
       <div className="flex flex-col sm:grid grid-cols-[3fr_1fr_1fr] gap-14 my-10 mt-40 text-sm">
         <div>
-          <img src={assets.logo} className="mb-5 w-32" alt="" />
+          <div className="mb-5 text-2xl font-bold">Clothswear</div>
           <p className="w-full md:w-2/3 text-gray-600">
-            This platform, <strong>Sadiastic</strong>, is proudly developed by{" "}
+            This platform, <strong>Clothswear</strong>, is proudly developed by{" "}
             <strong>Harshil</strong>, a Software Service and Production Company
             based in india. Dedicated to delivering innovative solutions,
             Harshil aims to empower businesses and individuals through

@@ -2,18 +2,19 @@ import { createContext, useEffect, useState } from "react";
 import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
 import axios from 'axios'
+import { products as fallbackProducts } from '../assets/assets';
 
 export const ShopContext = createContext();
 
 const ShopContextProvider = (props) => {
 
-    const currency = '$';
+    const currency = '₹';
     const delivery_fee = 10;
     const backendUrl = import.meta.env.VITE_BACKEND_URL
     const [search, setSearch] = useState('');
     const [showSearch, setShowSearch] = useState(false);
     const [cartItems, setCartItems] = useState({});
-    const [products, setProducts] = useState([]);
+    const [products, setProducts] = useState(fallbackProducts);
     const [token, setToken] = useState('')
     const navigate = useNavigate();
 
@@ -113,21 +114,24 @@ const ShopContextProvider = (props) => {
 
             const response = await axios.get(backendUrl + '/api/product/list')
             if (response.data.success) {
-                setProducts(response.data.products.reverse())
+                const loadedProducts = Array.isArray(response.data.products) ? response.data.products : [];
+                setProducts(loadedProducts.length ? [...loadedProducts].reverse() : fallbackProducts)
             } else {
-                toast.error(response.data.message)
+                setProducts(fallbackProducts)
+                toast.error(response.data.message || 'Showing demo products')
             }
 
         } catch (error) {
             console.log(error)
-            toast.error(error.message)
+            setProducts(fallbackProducts)
+            toast.error('Unable to load products from server. Showing demo products.')
         }
     }
 
-    const getUserCart = async ( token ) => {
+    const getUserCart = async (token) => {
         try {
-            
-            const response = await axios.post(backendUrl + '/api/cart/get',{},{headers:{token}})
+
+            const response = await axios.post(backendUrl + '/api/cart/get', {}, { headers: { token } })
             if (response.data.success) {
                 setCartItems(response.data.cartData)
             }
@@ -154,7 +158,7 @@ const ShopContextProvider = (props) => {
     const value = {
         products, currency, delivery_fee,
         search, setSearch, showSearch, setShowSearch,
-        cartItems, addToCart,setCartItems,
+        cartItems, addToCart, setCartItems,
         getCartCount, updateQuantity,
         getCartAmount, navigate, backendUrl,
         setToken, token
