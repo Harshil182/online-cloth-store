@@ -24,7 +24,8 @@ const placeOrder = async (req,res) => {
     
     try {
         
-        const { userId, items, amount, address} = req.body;
+        const { items, amount, address} = req.body;
+        const userId = req.userId
 
         const orderData = {
             userId,
@@ -58,7 +59,8 @@ const placeOrderStripe = async (req,res) => {
             return res.status(503).json({ success: false, message: 'Stripe payment is not configured' })
         }
         
-        const { userId, items, amount, address} = req.body
+        const { items, amount, address} = req.body
+        const userId = req.userId
         const { origin } = req.headers;
 
         const orderData = {
@@ -114,7 +116,8 @@ const placeOrderStripe = async (req,res) => {
 // Verify Stripe 
 const verifyStripe = async (req,res) => {
 
-    const { orderId, success, userId } = req.body
+    const { orderId, success } = req.body
+    const userId = req.userId
 
     try {
         if (success === "true") {
@@ -140,7 +143,8 @@ const placeOrderRazorpay = async (req,res) => {
             return res.status(503).json({ success: false, message: 'Razorpay payment is not configured' })
         }
         
-        const { userId, items, amount, address} = req.body
+        const { items, amount, address} = req.body
+        const userId = req.userId
 
         const orderData = {
             userId,
@@ -181,7 +185,8 @@ const verifyRazorpay = async (req,res) => {
             return res.status(503).json({ success: false, message: 'Razorpay payment is not configured' })
         }
         
-        const { userId, razorpay_order_id  } = req.body
+        const { razorpay_order_id  } = req.body
+        const userId = req.userId
 
         const orderInfo = await razorpayInstance.orders.fetch(razorpay_order_id)
         if (orderInfo.status === 'paid') {
@@ -218,7 +223,7 @@ const allOrders = async (req,res) => {
 const userOrders = async (req,res) => {
     try {
         
-        const { userId } = req.body
+        const userId = req.userId
 
         const orders = await orderModel.find({ userId })
         res.json({success:true,orders})

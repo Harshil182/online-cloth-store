@@ -1,6 +1,16 @@
 import mongoose from "mongoose";
 
+let connectionPromise;
+
 const connectDB = async () => {
+
+    if (mongoose.connection.readyState === 1) {
+        return mongoose.connection;
+    }
+
+    if (connectionPromise) {
+        return connectionPromise;
+    }
 
     mongoose.connection.on('connected',() => {
         console.log("DB Connected");
@@ -18,7 +28,14 @@ const connectDB = async () => {
 
     const dbUri = parsedUri.toString()
 
-    await mongoose.connect(dbUri)
+    connectionPromise = mongoose.connect(dbUri)
+    try {
+        await connectionPromise
+        return mongoose.connection
+    } catch (error) {
+        connectionPromise = undefined
+        throw error
+    }
 
 }
 

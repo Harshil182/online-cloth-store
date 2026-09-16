@@ -5,6 +5,10 @@ import productModel from "../models/productModel.js"
 const addProduct = async (req, res) => {
     try {
 
+        if (!process.env.CLOUDINARY_NAME || !process.env.CLOUDINARY_API_KEY || !process.env.CLOUDINARY_SECRET_KEY) {
+            return res.status(503).json({ success: false, message: 'Cloudinary is not configured' })
+        }
+
         const { name, description, price, category, subCategory, sizes, bestseller } = req.body
 
         const image1 = req.files.image1 && req.files.image1[0]
@@ -42,7 +46,7 @@ const addProduct = async (req, res) => {
 
     } catch (error) {
         console.log(error)
-        res.json({ success: false, message: error.message })
+        res.status(500).json({ success: false, message: error.message })
     }
 }
 
@@ -55,7 +59,7 @@ const listProducts = async (req, res) => {
 
     } catch (error) {
         console.log(error)
-        res.json({ success: false, message: error.message })
+        res.status(500).json({ success: false, message: error.message })
     }
 }
 
