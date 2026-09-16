@@ -18,6 +18,24 @@ const ShopContextProvider = (props) => {
     const [token, setToken] = useState('')
     const navigate = useNavigate();
 
+    const getAuthConfig = (authToken = token) => ({
+        headers: {
+            token: authToken,
+            Authorization: `Bearer ${authToken}`
+        }
+    });
+
+    const handleAuthFailure = (error) => {
+        if (error?.response?.status === 401) {
+            localStorage.removeItem('token');
+            setToken('');
+            navigate('/login');
+            toast.error('Your session expired. Please log in again.');
+            return true;
+        }
+        return false;
+    };
+
 
     const addToCart = async (itemId, size) => {
 
@@ -45,11 +63,11 @@ const ShopContextProvider = (props) => {
         if (token) {
             try {
 
-                await axios.post(backendUrl + '/api/cart/add', { itemId, size }, { headers: { token } })
+                await axios.post(backendUrl + '/api/cart/add', { itemId, size }, getAuthConfig())
 
             } catch (error) {
                 console.log(error)
-                toast.error(error.message)
+                if (!handleAuthFailure(error)) toast.error(error?.response?.data?.message || error.message)
             }
         }
 
@@ -82,11 +100,11 @@ const ShopContextProvider = (props) => {
         if (token) {
             try {
 
-                await axios.post(backendUrl + '/api/cart/update', { itemId, size, quantity }, { headers: { token } })
+                await axios.post(backendUrl + '/api/cart/update', { itemId, size, quantity }, getAuthConfig())
 
             } catch (error) {
                 console.log(error)
-                toast.error(error.message)
+                if (!handleAuthFailure(error)) toast.error(error?.response?.data?.message || error.message)
             }
         }
 
@@ -131,13 +149,13 @@ const ShopContextProvider = (props) => {
     const getUserCart = async (token) => {
         try {
 
-            const response = await axios.post(backendUrl + '/api/cart/get', {}, { headers: { token } })
+            const response = await axios.post(backendUrl + '/api/cart/get', {}, getAuthConfig(token))
             if (response.data.success) {
                 setCartItems(response.data.cartData)
             }
         } catch (error) {
             console.log(error)
-            toast.error(error.message)
+            handleAuthFailure(error)
         }
     }
 
@@ -161,7 +179,7 @@ const ShopContextProvider = (props) => {
         cartItems, addToCart, setCartItems,
         getCartCount, updateQuantity,
         getCartAmount, navigate, backendUrl,
-        setToken, token
+        setToken, token, getAuthConfig
     }
 
     return (

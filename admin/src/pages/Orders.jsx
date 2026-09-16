@@ -2,7 +2,7 @@ import React from 'react'
 import { useEffect } from 'react'
 import { useState } from 'react'
 import axios from 'axios'
-import { backendUrl, currency } from '../config'
+import { authConfig, backendUrl, currency } from '../config'
 import { toast } from 'react-toastify'
 import { assets } from '../assets/assets'
 
@@ -18,7 +18,7 @@ const Orders = ({ token }) => {
 
     try {
 
-      const response = await axios.post(backendUrl + '/api/order/list', {}, { headers: { token } })
+      const response = await axios.post(backendUrl + '/api/order/list', {}, authConfig(token))
       if (response.data.success) {
         setOrders(response.data.orders.reverse())
       } else {
@@ -26,7 +26,7 @@ const Orders = ({ token }) => {
       }
 
     } catch (error) {
-      toast.error(error.message)
+      toast.error(error?.response?.data?.message || 'Unable to load orders')
     }
 
 
@@ -34,13 +34,13 @@ const Orders = ({ token }) => {
 
   const statusHandler = async ( event, orderId ) => {
     try {
-      const response = await axios.post(backendUrl + '/api/order/status' , {orderId, status:event.target.value}, { headers: {token}})
+      const response = await axios.post(backendUrl + '/api/order/status', { orderId, status: event.target.value }, authConfig(token))
       if (response.data.success) {
         await fetchAllOrders()
       }
     } catch (error) {
       console.log(error)
-      toast.error(response.data.message)
+      toast.error(error?.response?.data?.message || 'Unable to update order')
     }
   }
 

@@ -1,6 +1,6 @@
 import axios from 'axios'
 import React, { useEffect, useState } from 'react'
-import { backendUrl, currency } from '../config'
+import { authConfig, backendUrl, currency } from '../config'
 import { toast } from 'react-toastify'
 
 const List = ({ token }) => {
@@ -20,14 +20,14 @@ const List = ({ token }) => {
 
     } catch (error) {
       console.log(error)
-      toast.error(error.message)
+      toast.error(error?.response?.data?.message || 'Unable to load products')
     }
   }
 
   const removeProduct = async (id) => {
     try {
 
-      const response = await axios.post(backendUrl + '/api/product/remove', { id }, { headers: { token } })
+      const response = await axios.post(backendUrl + '/api/product/remove', { id }, authConfig(token))
 
       if (response.data.success) {
         toast.success(response.data.message)
@@ -38,7 +38,7 @@ const List = ({ token }) => {
 
     } catch (error) {
       console.log(error)
-      toast.error(error.message)
+      toast.error(error?.response?.data?.message || 'Unable to remove product')
     }
   }
 

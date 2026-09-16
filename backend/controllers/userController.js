@@ -12,7 +12,12 @@ const createToken = (id) => {
 const loginUser = async (req, res) => {
     try {
 
-        const { email, password } = req.body;
+        const email = req.body.email?.trim().toLowerCase()
+        const { password } = req.body
+
+        if (!email || !password) {
+            return res.status(400).json({ success: false, message: 'Email and password are required' })
+        }
 
         const user = await userModel.findOne({ email });
 
@@ -42,20 +47,26 @@ const loginUser = async (req, res) => {
 const registerUser = async (req, res) => {
     try {
 
-        const { name, email, password } = req.body;
+        const name = req.body.name?.trim()
+        const email = req.body.email?.trim().toLowerCase()
+        const { password } = req.body
+
+        if (!name || !email || !password) {
+            return res.status(400).json({ success: false, message: 'Name, email and password are required' })
+        }
 
         // checking user already exists or not
         const exists = await userModel.findOne({ email });
         if (exists) {
-            return res.json({ success: false, message: "User already exists" })
+            return res.status(409).json({ success: false, message: "User already exists" })
         }
 
         // validating email format & strong password
         if (!validator.isEmail(email)) {
-            return res.json({ success: false, message: "Please enter a valid email" })
+            return res.status(400).json({ success: false, message: "Please enter a valid email" })
         }
         if (password.length < 8) {
-            return res.json({ success: false, message: "Please enter a strong password" })
+            return res.status(400).json({ success: false, message: "Please enter a strong password (minimum 8 characters)" })
         }
 
         // hashing user password
@@ -84,7 +95,8 @@ const registerUser = async (req, res) => {
 const adminLogin = async (req, res) => {
     try {
         
-        const {email,password} = req.body
+        const email = req.body.email?.trim().toLowerCase()
+        const { password } = req.body
 
         if (email === process.env.ADMIN_EMAIL && password === process.env.ADMIN_PASSWORD) {
             const token = jwt.sign({ isAdmin: true }, process.env.JWT_SECRET || 'supersecretjwtkey123', { expiresIn: '7d' });

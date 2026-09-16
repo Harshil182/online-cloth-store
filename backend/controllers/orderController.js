@@ -47,7 +47,7 @@ const placeOrder = async (req,res) => {
 
     } catch (error) {
         console.log(error)
-        res.json({success:false,message:error.message})
+        res.status(500).json({success:false,message:error.message})
     }
 
 }
@@ -109,7 +109,7 @@ const placeOrderStripe = async (req,res) => {
 
     } catch (error) {
         console.log(error)
-        res.json({success:false,message:error.message})
+        res.status(500).json({success:false,message:error.message})
     }
 }
 
@@ -131,7 +131,7 @@ const verifyStripe = async (req,res) => {
         
     } catch (error) {
         console.log(error)
-        res.json({success:false,message:error.message})
+        res.status(500).json({success:false,message:error.message})
     }
 
 }
@@ -175,7 +175,7 @@ const placeOrderRazorpay = async (req,res) => {
 
     } catch (error) {
         console.log(error)
-        res.json({success:false,message:error.message})
+        res.status(500).json({success:false,message:error.message})
     }
 }
 
