@@ -1,6 +1,7 @@
 import orderModel from "../models/orderModel.js";
 import userModel from "../models/userModel.js";
 import productModel from "../models/productModel.js";
+import mongoose from "mongoose";
 import Stripe from 'stripe'
 import razorpay from 'razorpay'
 
@@ -211,17 +212,28 @@ const allOrders = async (req,res) => {
     try {
         
         const orders = await orderModel.find({}).lean()
-        const productIds = orders
-            .flatMap((order) => order.items || [])
+        const orderItems = orders.flatMap((order) => order.items || [])
+        const productIds = orderItems
             .map((item) => item._id)
-            .filter(Boolean)
-        const products = await productModel.find({ _id: { $in: productIds } }).select('image').lean()
+            .filter((id) => typeof id === 'string' && mongoose.Types.ObjectId.isValid(id))
+        const productNames = orderItems
+            .filter((item) => !item.image?.length && typeof item.name === 'string' && item.name.trim())
+            .map((item) => item.name.trim())
+        const productQuery = []
+        if (productIds.length) productQuery.push({ _id: { $in: productIds } })
+        if (productNames.length) productQuery.push({ name: { $in: productNames } })
+        const products = productQuery.length
+            ? await productModel.find({ $or: productQuery }).select('name image').lean()
+            : []
         const productImages = new Map(products.map((product) => [String(product._id), product.image]))
+        const productImagesByName = new Map(products.map((product) => [product.name, product.image]))
 
         orders.forEach((order) => {
             order.items = (order.items || []).map((item) => ({
                 ...item,
-                image: item.image?.length ? item.image : productImages.get(String(item._id)) || []
+                image: item.image?.length
+                    ? item.image
+                    : productImages.get(String(item._id)) || productImagesByName.get(item.name) || []
             }))
         })
         res.json({success:true,orders})
