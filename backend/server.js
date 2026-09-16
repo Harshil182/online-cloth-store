@@ -24,13 +24,25 @@ const allowedOrigins = (process.env.CORS_ORIGINS || '')
     .map((origin) => origin.trim().replace(/\/$/, ''))
     .filter(Boolean)
 
+const isAllowedOrigin = (origin) => {
+    if (!origin) {
+        return true
+    }
+
+    if (allowedOrigins.includes(origin)) {
+        return true
+    }
+
+    return /^https:\/\/online-cloth-store(?:-[a-z0-9-]+)?\.vercel\.app$/i.test(origin)
+}
+
 app.use(cors({
     origin: (origin, callback) => {
-        if (!origin || allowedOrigins.length === 0 || allowedOrigins.includes(origin)) {
+        if (isAllowedOrigin(origin)) {
             return callback(null, true)
         }
 
-        return callback(new Error('Origin is not allowed by CORS'))
+        return callback(null, false)
     },
     credentials: true
 }))
@@ -43,6 +55,10 @@ app.use('/api/order',orderRouter)
 
 app.get('/',(req,res)=>{
     res.send("API Working")
+})
+
+app.get('/health',(req,res)=>{
+    res.json({ success: true, status: 'ok' })
 })
 
 if (!process.env.VERCEL) {
