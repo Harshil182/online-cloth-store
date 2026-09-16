@@ -12,6 +12,7 @@ export const resolveProductImage = (image) => {
 	if (!image || typeof image !== 'string') return ''
 	if (/^https?:\/\//i.test(image)) return image
 
-	const path = image.startsWith('/') ? image : `/${image}`
+	const productAsset = image.match(/(p_img\d+(?:[_-]\d+)?)(?:-[a-z0-9]+)?\.png/i)
+	const path = productAsset ? `/assets/${productAsset[1]}.png` : (image.startsWith('/') ? image : `/${image}`)
 	return `https://online-cloth-store-eight.vercel.app${path}`
 }
