@@ -2,7 +2,7 @@ import React from 'react'
 import { useEffect } from 'react'
 import { useState } from 'react'
 import axios from 'axios'
-import { authConfig, backendUrl, currency } from '../config'
+import { authConfig, backendUrl, currency, resolveProductImage } from '../config'
 import { toast } from 'react-toastify'
 import { assets } from '../assets/assets'
 
@@ -74,9 +74,14 @@ const Orders = ({ token }) => {
                 <div className='flex flex-col gap-2'>
                 <div>
                   {order.items.map((item, index) => {
-                    const image = Array.isArray(item.image) ? item.image[0] : item.image
+                    const image = resolveProductImage(Array.isArray(item.image) ? item.image[0] : item.image)
                     return <div className='flex items-center gap-2 py-1' key={index}>
-                      <img className='w-12 h-12 object-cover border' src={image || assets.parcel_icon} alt={item.name} />
+                      <img
+                        className='w-16 h-16 object-cover border'
+                        src={image || assets.parcel_icon}
+                        alt={item.name}
+                        onError={(event) => { event.currentTarget.src = assets.parcel_icon }}
+                      />
                       <p>{item.name} x {item.quantity} <span>{item.size}</span></p>
                     </div>
                   })}

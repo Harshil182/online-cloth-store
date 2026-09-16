@@ -7,3 +7,11 @@ export const authConfig = (token) => ({
 		Authorization: `Bearer ${token}`
 	}
 })
+
+export const resolveProductImage = (image) => {
+	if (!image || typeof image !== 'string') return ''
+	if (/^https?:\/\//i.test(image)) return image
+
+	const path = image.startsWith('/') ? image : `/${image}`
+	return `https://online-cloth-store-eight.vercel.app${path}`
+}
