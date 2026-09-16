@@ -11,12 +11,29 @@ import orderRouter from './routes/orderRoute.js'
 // App Config
 const app = express()
 const port = process.env.PORT || 4000
-connectDB()
+connectDB().catch((error) => {
+    console.error('Database connection failed:', error.message)
+})
 connectCloudinary()
 
 // middlewares
 app.use(express.json())
-app.use(cors())
+
+const allowedOrigins = (process.env.CORS_ORIGINS || '')
+    .split(',')
+    .map((origin) => origin.trim().replace(/\/$/, ''))
+    .filter(Boolean)
+
+app.use(cors({
+    origin: (origin, callback) => {
+        if (!origin || allowedOrigins.length === 0 || allowedOrigins.includes(origin)) {
+            return callback(null, true)
+        }
+
+        return callback(new Error('Origin is not allowed by CORS'))
+    },
+    credentials: true
+}))
 
 // api endpoints
 app.use('/api/user',userRouter)
@@ -28,4 +45,8 @@ app.get('/',(req,res)=>{
     res.send("API Working")
 })
 
-app.listen(port, ()=> console.log('Server started on PORT : '+ port))
+if (!process.env.VERCEL) {
+    app.listen(port, ()=> console.log('Server started on PORT : '+ port))
+}
+
+export default app

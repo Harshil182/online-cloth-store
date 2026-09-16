@@ -6,7 +6,19 @@ const connectDB = async () => {
         console.log("DB Connected");
     })
 
-    await mongoose.connect(`${process.env.MONGODB_URI}/e-commerce`)
+    const uri = process.env.MONGODB_URI
+    if (!uri) {
+        throw new Error('MONGODB_URI is not configured')
+    }
+
+    const parsedUri = new URL(uri)
+    if (!parsedUri.pathname || parsedUri.pathname === '/') {
+        parsedUri.pathname = '/e-commerce'
+    }
+
+    const dbUri = parsedUri.toString()
+
+    await mongoose.connect(dbUri)
 
 }
 

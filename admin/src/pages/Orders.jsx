@@ -2,7 +2,7 @@ import React from 'react'
 import { useEffect } from 'react'
 import { useState } from 'react'
 import axios from 'axios'
-import { backendUrl, currency } from '../App'
+import { backendUrl, currency } from '../config'
 import { toast } from 'react-toastify'
 import { assets } from '../assets/assets'
 
