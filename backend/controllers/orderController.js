@@ -1,5 +1,6 @@
 import orderModel from "../models/orderModel.js";
 import userModel from "../models/userModel.js";
+import productModel from "../models/productModel.js";
 import Stripe from 'stripe'
 import razorpay from 'razorpay'
 
@@ -209,7 +210,20 @@ const allOrders = async (req,res) => {
 
     try {
         
-        const orders = await orderModel.find({})
+        const orders = await orderModel.find({}).lean()
+        const productIds = orders
+            .flatMap((order) => order.items || [])
+            .map((item) => item._id)
+            .filter(Boolean)
+        const products = await productModel.find({ _id: { $in: productIds } }).select('image').lean()
+        const productImages = new Map(products.map((product) => [String(product._id), product.image]))
+
+        orders.forEach((order) => {
+            order.items = (order.items || []).map((item) => ({
+                ...item,
+                image: item.image?.length ? item.image : productImages.get(String(item._id)) || []
+            }))
+        })
         res.json({success:true,orders})
 
     } catch (error) {
@@ -249,4 +263,29 @@ const updateStatus = async (req,res) => {
     }
 }
 
-export {verifyRazorpay, verifyStripe ,placeOrder, placeOrderStripe, placeOrderRazorpay, allOrders, userOrders, updateStatus}
+const updatePayment = async (req, res) => {
+    try {
+        const { orderId, payment } = req.body
+
+        if (typeof payment !== 'boolean') {
+            return res.status(400).json({ success: false, message: 'Payment value must be true or false' })
+        }
+
+        const order = await orderModel.findByIdAndUpdate(
+            orderId,
+            { payment },
+            { new: true }
+        )
+
+        if (!order) {
+            return res.status(404).json({ success: false, message: 'Order not found' })
+        }
+
+        res.json({ success: true, message: payment ? 'Payment marked as paid' : 'Payment marked as pending' })
+    } catch (error) {
+        console.log(error)
+        res.status(500).json({ success: false, message: error.message })
+    }
+}
+
+export {verifyRazorpay, verifyStripe, placeOrder, placeOrderStripe, placeOrderRazorpay, allOrders, userOrders, updateStatus, updatePayment}
